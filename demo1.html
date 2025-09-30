@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Demo Uno</title>
+    
+    <!-- Tabulator CSS -->
+    <link href="https://unpkg.com/tabulator-tables@5.5.2/dist/css/tabulator.min.css" rel="stylesheet">
+    
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #333;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            overflow: hidden;
+        }
+
+        header {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .subtitle {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+
+        .content {
+            padding: 30px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+        }
+
+        .section {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        .section-title {
+            color: #2a5298;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #e9ecef;
+            font-size: 1.4em;
+        }
+
+        .full-width {
+            grid-column: 1 / -1;
+        }
+
+        .chart-container {
+            height: 300px;
+            position: relative;
+        }
+
+        #map {
+            height: 400px;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .data-section {
+            background: white;
+        }
+
+        .info-box {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 15px;
+        }
+
+        footer {
+            background: #1e3c72;
+            color: white;
+            text-align: center;
+            padding: 20px;
+            margin-top: 30px;
+        }
+
+        @media (max-width: 768px) {
+            .content {
+                grid-template-columns: 1fr;
+            }
+            
+            h1 {
+                font-size: 2em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🌊 Demo Uno/h1>
+            <p class="subtitle">Tabulator + Chart.js + ECharts + Leaflet </p>
+        </header>
+
+        <div class="content">
+            <!-- Tabulator - Tabla de distritos de Lima -->
+            <div class="section full-width data-section">
+                <h2 class="section-title">📊 Distritos de Lima - Población 2023</h2>
+                <div id="distritos-table"></div>
+            </div>
+
+            <!-- Chart.js - Gráfico de barras -->
+            <div class="section">
+                <h2 class="section-title">📈 Población por Distrito (Chart.js)</h2>
+                <div class="chart-container">
+                    <canvas id="population-chart"></canvas>
+                </div>
+            </div>
+
+            <!-- ECharts - Gráfico circular -->
+            <div class="section">
+                <h2 class="section-title">🥧 Distribución Regional (ECharts)</h2>
+                <div class="chart-container">
+                    <div id="region-chart" style="height: 100%;"></div>
+                </div>
+            </div>
+
+            <!-- Leaflet - Mapa de Lima -->
+            <div class="section full-width">
+                <h2 class="section-title">🗺️ Mapa de Lima Metropolitana</h2>
+                <div id="map"></div>
+                <div class="info-box">
+                    <strong>📍 Ubicación Central:</strong> Plaza Mayor de Lima (-12.0464, -77.0428)
+                </div>
+            </div>
+        </div>
+
+        <footer>
+            <p>Demo Uno verificando el soporte a caracteres españoles (ñ, á, é, í, ó, ú) - Lima, Perú 🇵🇪</p>
+        </footer>
+    </div>
+
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <!-- ECharts -->
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
+    
+    <!-- Leaflet -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    
+    <!-- Tabulator -->
+    <script src="https://unpkg.com/tabulator-tables@5.5.2/dist/js/tabulator.min.js"></script>
+
+    <script>
+        // Datos de distritos de Lima con caracteres españoles
+        const distritosData = [
+            { id: 1, distrito: "Lima Cercado", poblacion: 268352, area: 21.98, fundacion: "1535" },
+            { id: 2, distrito: "San Isidro", poblacion: 58399, area: 11.10, fundacion: "1931" },
+            { id: 3, distrito: "Miraflores", poblacion: 85506, area: 9.62, fundacion: "1857" },
+            { id: 4, distrito: "Barranco", poblacion: 30698, area: 3.33, fundacion: "1874" },
+            { id: 5, distrito: "Surco", poblacion: 393744, area: 34.75, fundacion: "1920" },
+            { id: 6, distrito: "La Molina", poblacion: 132498, area: 65.75, fundacion: "1962" },
+            { id: 7, distrito: "San Borja", poblacion: 113828, area: 9.96, fundacion: "1983" },
+            { id: 8, distrito: "Jesus María", poblacion: 73459, area: 4.57, fundacion: "1963" },
+            { id: 9, distrito: "Pueblo Libre", poblacion: 85958, area: 4.38, fundacion: "1821" },
+            { id: 10, distrito: "Magdalena", poblacion: 60984, area: 3.61, fundacion: "1920" }
+        ];
+
+        // 1. INICIALIZAR TABULATOR
+        const table = new Tabulator("#distritos-table", {
+            data: distritosData,
+            layout: "fitColumns",
+            pagination: "local",
+            paginationSize: 5,
+            paginationSizeSelector: [5, 10, 20],
+            columns: [
+                { title: "ID", field: "id", width: 80, hozAlign: "center" },
+                { title: "Distrito", field: "distrito", headerFilter: "input" },
+                { 
+                    title: "Población", 
+                    field: "poblacion", 
+                    hozAlign: "right",
+                    formatter: "number",
+                    formatterParams: { thousand: ",", precision: 0 }
+                },
+                { 
+                    title: "Área (km²)", 
+                    field: "area", 
+                    hozAlign: "right",
+                    formatter: "number",
+                    formatterParams: { precision: 2 }
+                },
+                { title: "Fundación", field: "fundacion", hozAlign: "center" }
+            ],
+            locale: true,
+            langs: {
+                "es-es": {
+                    "pagination": {
+                        "first": "Primera",
+                        "first_title": "Primera Página",
+                        "last": "Última",
+                        "last_title": "Última Página",
+                        "prev": "Anterior",
+                        "prev_title": "Página Anterior",
+                        "next": "Siguiente",
+                        "next_title": "Siguiente Página"
+                    }
+                }
+            }
+        });
+
+        // 2. INICIALIZAR CHART.JS
+        const populationChart = new Chart(
+            document.getElementById('population-chart'),
+            {
+                type: 'bar',
+                data: {
+                    labels: distritosData.map(d => d.distrito),
+                    datasets: [{
+                        label: 'Población 2023',
+                        data: distritosData.map(d => d.poblacion),
+                        backgroundColor: [
+                            '#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0',
+                            '#9966FF', '#FF9F40', '#FF6384', '#C9CBCF',
+                            '#4BC0C0', '#36A2EB'
+                        ],
+                        borderColor: '#2a5298',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: 'Población de Distritos Limeños',
+                            font: { size: 16 }
+                        },
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Población'
+                            }
+                        },
+                        x: {
+                            ticks: {
+                                maxRotation: 45,
+                                minRotation: 45
+                            }
+                        }
+                    }
+                }
+            }
+        );
+
+        // 3. INICIALIZAR ECHARTS
+        const regionChart = echarts.init(document.getElementById('region-chart'));
+        const regionOption = {
+            title: {
+                text: 'Distribución por Área',
+                subtext: 'Distritos de Lima Metropolitana',
+                left: 'center'
+            },
+            tooltip: {
+                trigger: 'item',
+                formatter: '{a} <br/>{b}: {c} km² ({d}%)'
+            },
+            legend: {
+                orient: 'vertical',
+                left: 'left',
+                top: 'bottom'
+            },
+            series: [
+                {
+                    name: 'Área Territorial',
+                    type: 'pie',
+                    radius: '70%',
+                    data: distritosData.map(d => ({
+                        value: d.area,
+                        name: d.distrito
+                    })),
+                    emphasis: {
+                        itemStyle: {
+                            shadowBlur: 10,
+                            shadowOffsetX: 0,
+                            shadowColor: 'rgba(0, 0, 0, 0.5)'
+                        }
+                    },
+                    label: {
+                        formatter: '{b}: {c} km²'
+                    }
+                }
+            ]
+        };
+        regionChart.setOption(regionOption);
+
+        // 4. INICIALIZAR LEAFLET MAPA
+        const map = L.map('map').setView([-12.0464, -77.0428], 11);
+
+        // Capa base de OpenStreetMap
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '© OpenStreetMap contributors',
+            maxZoom: 18
+        }).addTo(map);
+
+        // Marcadores para algunos distritos importantes
+        const lugaresLima = [
+            {
+                nombre: "Plaza Mayor de Lima",
+                coords: [-12.0464, -77.0428],
+                descripcion: "Centro histórico y fundacional de Lima"
+            },
+            {
+                nombre: "Miraflores",
+                coords: [-12.1224, -77.0302],
+                descripcion: "Distrito turístico y comercial"
+            },
+            {
+                nombre: "San Isidro",
+                coords: [-12.0984, -77.0437],
+                descripcion: "Centro financiero de Lima"
+            },
+            {
+                nombre: "Barranco",
+                coords: [-12.1425, -77.0212],
+                descripcion: "Distrito bohemio y cultural"
+            },
+            {
+                nombre: "Aeropuerto Jorge Chávez",
+                coords: [-12.0219, -77.1143],
+                descripcion: "Aeropuerto internacional de Lima"
+            }
+        ];
+
+        lugaresLima.forEach(lugar => {
+            L.marker(lugar.coords)
+                .addTo(map)
+                .bindPopup(`
+                    <strong>${lugar.nombre}</strong><br>
+                    ${lugar.descripcion}<br>
+                    <em>Coordenadas: ${lugar.coords[0]}, ${lugar.coords[1]}</em>
+                `);
+        });
+
+        // Ajustar el mapa al viewport
+        setTimeout(() => {
+            map.invalidateSize();
+        }, 100);
+
+        // Responsive para ventana
+        window.addEventListener('resize', function() {
+            populationChart.resize();
+            regionChart.resize();
+            map.invalidateSize();
+        });
+    </script>
+</body>
+</html>

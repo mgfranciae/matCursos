@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>WebRTC Demo - Unirse a la sala</title>
+  <link rel="stylesheet" href="/styles/style.css">
+</head>
+<body>
+  <h1>WebRTC Video/Audio Demo</h1>
+  <p>Crea una sala.</p>
+  
+  <!-- Form to create/join room -->
+  <form action="/room" method="POST">
+    <label for="roomId">Sala ID:</label>
+    <input type="text" id="roomId" name="roomId" placeholder="e.g., sala_de_Prueba" required>
+    <button type="submit">Unirse/Crear Sala</button>
+  </form>
+</body>
+</html>

@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Canvas HTML5</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        .canvas-container { margin: 20px 0; }
+        canvas { border: 1px solid #ccc; background: #f9f9f9; }
+        button { padding: 8px 15px; margin: 5px; }
+    </style>
+</head>
+<body>
+    <h1>🎨 Canvas HTML5 - Gráficos y Animaciones</h1>
+
+    <div class="canvas-container">
+        <h3>Dibujo Básico</h3>
+        <canvas id="basicCanvas" width="400" height="200"></canvas>
+    </div>
+
+    <div class="canvas-container">
+        <h3>Animación</h3>
+        <canvas id="animationCanvas" width="400" height="200"></canvas>
+        <br>
+        <button onclick="startAnimation()">Iniciar Animación</button>
+        <button onclick="stopAnimation()">Detener</button>
+    </div>
+
+    <div class="canvas-container">
+        <h3>Manipulación de Imágenes</h3>
+        <canvas id="imageCanvas" width="400" height="300"></canvas>
+        <br>
+        <input type="file" id="imageInput" accept="image/*">
+    </div>
+
+    <script>
+        // Canvas Básico
+        const basicCanvas = document.getElementById('basicCanvas');
+        const basicCtx = basicCanvas.getContext('2d');
+        
+        // Dibujar formas
+        basicCtx.fillStyle = '#3498db';
+        basicCtx.fillRect(50, 50, 100, 80);
+        
+        basicCtx.fillStyle = '#e74c3c';
+        basicCtx.beginPath();
+        basicCtx.arc(250, 100, 40, 0, Math.PI * 2);
+        basicCtx.fill();
+        
+        basicCtx.strokeStyle = '#2ecc71';
+        basicCtx.lineWidth = 3;
+        basicCtx.beginPath();
+        basicCtx.moveTo(320, 50);
+        basicCtx.lineTo(380, 150);
+        basicCtx.lineTo(260, 150);
+        basicCtx.closePath();
+        basicCtx.stroke();
+
+        // Animación
+        const animCanvas = document.getElementById('animationCanvas');
+        const animCtx = animCanvas.getContext('2d');
+        let animationId;
+        let x = 0;
+        
+        function drawAnimation() {
+            animCtx.clearRect(0, 0, animCanvas.width, animCanvas.height);
+            
+            animCtx.fillStyle = '#9b59b6';
+            animCtx.beginPath();
+            animCtx.arc(x, 100, 20, 0, Math.PI * 2);
+            animCtx.fill();
+            
+            x += 2;
+            if (x > animCanvas.width + 20) x = -20;
+            
+            animationId = requestAnimationFrame(drawAnimation);
+        }
+        
+        function startAnimation() {
+            if (!animationId) {
+                drawAnimation();
+            }
+        }
+        
+        function stopAnimation() {
+            cancelAnimationFrame(animationId);
+            animationId = null;
+        }
+
+        // Manipulación de Imágenes
+        const imageCanvas = document.getElementById('imageCanvas');
+        const imageCtx = imageCanvas.getContext('2d');
+        const imageInput = document.getElementById('imageInput');
+        
+        imageInput.addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    const img = new Image();
+                    img.onload = function() {
+                        // Dibujar imagen original
+                        imageCtx.drawImage(img, 0, 0, 200, 150);
+                        
+                        // Aplicar filtro sepia
+                        imageCtx.drawImage(img, 200, 0, 200, 150);
+                        const imageData = imageCtx.getImageData(200, 0, 200, 150);
+                        const data = imageData.data;
+                        for (let i = 0; i < data.length; i += 4) {
+                            const r = data[i];
+                            const g = data[i + 1];
+                            const b = data[i + 2];
+                            data[i] = Math.min(255, (r * 0.393) + (g * 0.769) + (b * 0.189));
+                            data[i + 1] = Math.min(255, (r * 0.349) + (g * 0.686) + (b * 0.168));
+                            data[i + 2] = Math.min(255, (r * 0.272) + (g * 0.534) + (b * 0.131));
+                        }
+                        imageCtx.putImageData(imageData, 200, 0);
+                    };
+                    img.src = event.target.result;
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+    </script>
+</body>
+</html>

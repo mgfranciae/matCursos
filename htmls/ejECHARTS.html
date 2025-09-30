@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ECharts - Demo</title>
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        h1 {
+            color: #2a5298;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .charts-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+        .chart-container {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            height: 400px;
+        }
+        .full-width {
+            grid-column: 1 / -1;
+            height: 500px;
+        }
+        .info {
+            background: #e8f4fd;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border-left: 4px solid #3498db;
+        }
+        @media (max-width: 768px) {
+            .charts-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📊 ECharts - Visualizaciones Avanzadas</h1>
+        
+        <div class="info">
+            <strong>Características demostradas:</strong> Gráficos interactivos, efectos visuales, múltiples ejes, tooltips avanzados.
+        </div>
+
+        <div class="charts-grid">
+            <div class="chart-container">
+                <div id="pie-chart" style="height: 100%;"></div>
+            </div>
+            <div class="chart-container">
+                <div id="bar-chart" style="height: 100%;"></div>
+            </div>
+            <div class="chart-container full-width">
+                <div id="line-chart" style="height: 100%;"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 1. Gráfico Circular - Distribución de Presupuesto
+        const pieChart = echarts.init(document.getElementById('pie-chart'));
+        const pieOption = {
+            title: {
+                text: 'Distribución Presupuestal',
+                subtext: 'Año Fiscal 2024',
+                left: 'center',
+                textStyle: {
+                    fontSize: 16
+                }
+            },
+            tooltip: {
+                trigger: 'item',
+                formatter: '{a} <br/>{b}: {c} millones ({d}%)',
+                backgroundColor: 'rgba(0,0,0,0.8)',
+                textStyle: {
+                    color: '#fff'
+                }
+            },
+            legend: {
+                orient: 'vertical',
+                left: 'left',
+                top: 'bottom'
+            },
+            series: [{
+                name: 'Presupuesto',
+                type: 'pie',
+                radius: ['40%', '70%'],
+                avoidLabelOverlap: false,
+                itemStyle: {
+                    borderRadius: 10,
+                    borderColor: '#fff',
+                    borderWidth: 2
+                },
+                label: {
+                    show: false,
+                    position: 'center'
+                },
+                emphasis: {
+                    label: {
+                        show: true,
+                        fontSize: 18,
+                        fontWeight: 'bold'
+                    }
+                },
+                labelLine: {
+                    show: false
+                },
+                data: [
+                    { value: 45, name: 'Tecnología' },
+                    { value: 20, name: 'Marketing' },
+                    { value: 15, name: 'Operaciones' },
+                    { value: 10, name: 'Recursos Humanos' },
+                    { value: 5, name: 'Investigación' },
+                    { value: 5, name: 'Contingencias' }
+                ]
+            }]
+        };
+        pieChart.setOption(pieOption);
+
+        // 2. Gráfico de Barras - Rendimiento por Región
+        const barChart = echarts.init(document.getElementById('bar-chart'));
+        const barOption = {
+            title: {
+                text: 'Rendimiento por Región',
+                subtext: 'Ventas Q1 2024',
+                left: 'center',
+                textStyle: {
+                    fontSize: 16
+                }
+            },
+            tooltip: {
+                trigger: 'axis',
+                axisPointer: {
+                    type: 'shadow'
+                }
+            },
+            xAxis: {
+                type: 'category',
+                data: ['Lima', 'Arequipa', 'Trujillo', 'Cusco', 'Chiclayo', 'Piura', 'Iquitos'],
+                axisLabel: {
+                    rotate: 45
+                }
+            },
+            yAxis: {
+                type: 'value',
+                name: 'Ventas (Miles S/)'
+            },
+            series: [{
+                name: 'Ventas',
+                type: 'bar',
+                data: [120, 85, 78, 65, 55, 48, 42],
+                itemStyle: {
+                    color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+                        { offset: 0, color: '#83bff6' },
+                        { offset: 0.5, color: '#188df0' },
+                        { offset: 1, color: '#188df0' }
+                    ])
+                },
+                emphasis: {
+                    itemStyle: {
+                        color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+                            { offset: 0, color: '#2378f7' },
+                            { offset: 0.7, color: '#2378f7' },
+                            { offset: 1, color: '#83bff6' }
+                        ])
+                    }
+                }
+            }]
+        };
+        barChart.setOption(barOption);
+
+        // 3. Gráfico de Líneas - Métricas de Proyecto
+        const lineChart = echarts.init(document.getElementById('line-chart'));
+        const lineOption = {
+            title: {
+                text: 'Métricas de Proyecto - 2024',
+                left: 'center',
+                textStyle: {
+                    fontSize: 18
+                }
+            },
+            tooltip: {
+                trigger: 'axis'
+            },
+            legend: {
+                data: ['Completado', 'En Progreso', 'Pendiente', 'Rendimiento'],
+                top: '10%'
+            },
+            grid: {
+                left: '3%',
+                right: '4%',
+                bottom: '3%',
+                containLabel: true
+            },
+            xAxis: {
+                type: 'category',
+                boundaryGap: false,
+                data: ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic']
+            },
+            yAxis: [
+                {
+                    type: 'value',
+                    name: 'Tareas',
+                    position: 'left'
+                },
+                {
+                    type: 'value',
+                    name: 'Rendimiento %',
+                    position: 'right',
+                    max: 100
+                }
+            ],
+            series: [
+                {
+                    name: 'Completado',
+                    type: 'line',
+                    stack: 'Total',
+                    data: [120, 132, 101, 134, 90, 230, 210, 182, 191, 234, 290, 330],
+                    smooth: true,
+                    lineStyle: {
+                        width: 3
+                    }
+                },
+                {
+                    name: 'En Progreso',
+                    type: 'line',
+                    stack: 'Total',
+                    data: [220, 182, 191, 234, 290, 330, 310, 201, 154, 190, 230, 210],
+                    smooth: true,
+                    lineStyle: {
+                        width: 3
+                    }
+                },
+                {
+                    name: 'Pendiente',
+                    type: 'line',
+                    stack: 'Total',
+                    data: [150, 232, 201, 154, 190, 330, 410, 320, 280, 190, 130, 110],
+                    smooth: true,
+                    lineStyle: {
+                        width: 3
+                    }
+                },
+                {
+                    name: 'Rendimiento',
+                    type: 'line',
+                    yAxisIndex: 1,
+                    data: [65, 68, 72, 75, 78, 82, 85, 88, 86, 90, 92, 95],
+                    smooth: true,
+                    lineStyle: {
+                        width: 3,
+                        type: 'dashed'
+                    }
+                }
+            ]
+        };
+        lineChart.setOption(lineOption);
+
+        // Responsive
+        window.addEventListener('resize', function() {
+            pieChart.resize();
+            barChart.resize();
+            lineChart.resize();
+        });
+    </script>
+</body>
+</html>

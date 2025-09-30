@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Quill Editor</title>
+  <link rel="stylesheet" href="/styles/style.css">
+  <!-- Quill.js CDN for rich text editor -->
+  <link href="https://cdn.jsdelivr.net/npm/quill@2.0.2/dist/quill.snow.css" rel="stylesheet">
+</head>
+<body>
+  <h1>Quill Editor Page</h1>
+  <!-- Container for Quill editor -->
+  <div id="editor"></div>
+
+  <!-- Quill.js script CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/quill@2.0.2/dist/quill.js"></script>
+  <script>
+    // Initialize Quill editor
+    var quill = new Quill('#editor', {
+      theme: 'snow' // Use snow theme for toolbar
+    });
+    // Set the initial text to the passed phrase
+    quill.setText('<%= phrase %>');
+    console.log('Quill editor initialized with phrase: "<%= phrase %>".');
+  </script>
+</body>
+</html>

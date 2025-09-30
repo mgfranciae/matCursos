@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Ejemplo de uso de Quill</title>
+  <!-- Quill.js CDN for styling -->
+  <link href="https://cdn.jsdelivr.net/npm/quill@2.0.2/dist/quill.snow.css" rel="stylesheet">
+  <style>
+    /* Basic styling for the editor container */
+    #editor {
+      height: 200px;
+      margin: 20px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Ejemplo sencillo de uso de QUILL EDITOR</h1>
+  <!-- Container for Quill editor -->
+  <div id="editor"></div>
+
+  <!-- Quill.js script CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/quill@2.0.2/dist/quill.js"></script>
+  <script>
+    // Initialize Quill editor with snow theme (includes toolbar)
+    const quill = new Quill('#editor', {
+      theme: 'snow',
+      placeholder: 'Escribe el texto acá...'
+    });
+    console.log('Quill editor initializado.');
+  </script>
+</body>
+</html>

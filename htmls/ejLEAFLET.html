@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Leaflet - Demo</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        h1 {
+            color: #2a5298;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .map-layout {
+            display: grid;
+            grid-template-columns: 1fr 300px;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        #map {
+            height: 500px;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        .sidebar {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            height: 500px;
+            overflow-y: auto;
+        }
+        .location-item {
+            background: white;
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 8px;
+            border-left: 4px solid #3498db;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .location-item:hover {
+            transform: translateX(5px);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .location-item.active {
+            border-left-color: #e74c3c;
+            background: #e8f4fd;
+        }
+        .info {
+            background: #e8f4fd;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border-left: 4px solid #3498db;
+        }
+        .controls {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        .btn {
+            padding: 10px 15px;
+            background: #3498db;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+        .btn:hover {
+            background: #2980b9;
+        }
+        @media (max-width: 768px) {
+            .map-layout {
+                grid-template-columns: 1fr;
+            }
+            .sidebar {
+                height: 300px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🗺️ Leaflet - Mapas Interactivos</h1>
+        
+        <div class="info">
+            <strong>Características demostradas:</strong> Mapa interactivo, marcadores, popups, capas, geolocalización, polígonos.
+        </div>
+
+        <div class="controls">
+            <button class="btn" onclick="centrarLima()">Centrar en Lima</button>
+            <button class="btn" onclick="mostrarTodosMarcadores()">Mostrar Todos</button>
+            <button class="btn" onclick="limpiarMapa()">Limpiar Mapa</button>
+            <button class="btn" onclick="dibujarZonaCentro()">Zona Centro Histórico</button>
+        </div>
+
+        <div class="map-layout">
+            <div id="map"></div>
+            <div class="sidebar" id="sidebar">
+                <h3>📍 Lugares Importantes</h3>
+                <div class="location-list" id="location-list">
+                    <!-- Las ubicaciones se cargan dinámicamente -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script>
+        // Inicializar mapa centrado en Lima
+        const map = L.map('map').setView([-12.0464, -77.0428], 12);
+
+        // Capas base
+        const osmLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '© OpenStreetMap contributors',
+            maxZoom: 18
+        }).addTo(map);
+
+        const satelliteLayer = L.tileLayer('https://{s}.google.com/vt/lyrs=s&x={x}&y={y}&z={z}', {
+            maxZoom: 20,
+            subdomains: ['mt0', 'mt1', 'mt2', 'mt3'],
+            attribution: '© Google Satellite'
+        });
+
+        // Capa de control
+        const baseMaps = {
+            "OpenStreetMap": osmLayer,
+            "Satélite": satelliteLayer
+        };
+        L.control.layers(baseMaps).addTo(map);
+
+        // Datos de ubicaciones importantes en Lima
+        const lugaresLima = [
+            {
+                id: 1,
+                nombre: "Plaza Mayor de Lima",
+                coords: [-12.0464, -77.0428],
+                tipo: "Histórico",
+                descripcion: "Fundada en 1535, corazón del centro histórico de Lima. Aquí se encuentra el Palacio de Gobierno, la Catedral y el Palacio Municipal.",
+                icono: "🏛️"
+            },
+            {
+                id: 2,
+                nombre: "Parque del Amor - Miraflores",
+                coords: [-12.1306, -77.0383],
+                tipo: "Turístico",
+                descripcion: "Famoso parque con vista al océano Pacífico, conocido por su escultura 'El Beso' y sus coloridos mosaicos.",
+                icono: "💖"
+            },
+            {
+                id: 3,
+                nombre: "Huaca Pucllana",
+                coords: [-12.1156, -77.0339],
+                tipo: "Arqueológico",
+                descripcion: "Sitio arqueológico preincaico en medio de Miraflores. Pirámide de adobe de la cultura Lima (200-700 d.C.).",
+                icono: "🏺"
+            },
+            {
+                id: 4,
+                nombre: "Museo Larco",
+                coords: [-12.0728, -77.0636],
+                tipo: "Cultural",
+                descripcion: "Museo ubicado en una mansión virreinal del siglo XVIII, exhibe galerías de arte precolombino.",
+                icono: "🖼️"
+            },
+            {
+                id: 5,
+                nombre: "Centro Comercial Jockey Plaza",
+                coords: [-12.1103, -76.9758],
+                tipo: "Comercial",
+                descripcion: "Uno de los centros comerciales más grandes de Lima, ubicado en el distrito de Santiago de Surco.",
+                icono: "🛍️"
+            },
+            {
+                id: 6,
+                nombre: "Aeropuerto Jorge Chávez",
+                coords: [-12.0219, -77.1143],
+                tipo: "Transporte",
+                descripcion: "Principal aeropuerto internacional del Perú, conecta Lima con destinos nacionales e internacionales.",
+                icono: "✈️"
+            },
+            {
+                id: 7,
+                nombre: "Parque de la Reserva - Circuito Mágico del Agua",
+                coords: [-12.0678, -77.0342],
+                tipo: "Entretenimiento",
+                descripcion: "Complejo de fuentes ornamentales, posee el Récord Guinness al complejo de fuentes más grande del mundo.",
+                icono: "💧"
+            },
+            {
+                id: 8,
+                nombre: "Barranco - Puente de los Suspiros",
+                coords: [-12.1486, -77.0222],
+                tipo: "Cultural",
+                descripcion: "Barrio bohemio de Lima, conocido por su puente de madera, galerías de arte y vida nocturna.",
+                icono: "🎨"
+            }
+        ];
+
+        // Grupo para los marcadores
+        const markersGroup = L.layerGroup().addTo(map);
+
+        // Crear marcadores y lista lateral
+        lugaresLima.forEach(lugar => {
+            // Crear marcador personalizado
+            const marker = L.marker(lugar.coords)
+                .addTo(markersGroup)
+                .bindPopup(`
+                    <div style="min-width: 250px;">
+                        <h3 style="margin: 0 0 10px 0; color: #2a5298;">${lugar.icono} ${lugar.nombre}</h3>
+                        <p><strong>Tipo:</strong> ${lugar.tipo}</p>
+                        <p>${lugar.descripcion}</p>
+                        <p style="font-size: 12px; color: #666;">
+                            <em>Coordenadas: ${lugar.coords[0].toFixed(4)}, ${lugar.coords[1].toFixed(4)}</em>
+                        </p>
+                    </div>
+                `);
+
+            // Crear elemento en la lista lateral
+            const listItem = document.createElement('div');
+            listItem.className = 'location-item';
+            listItem.innerHTML = `
+                <strong>${lugar.icono} ${lugar.nombre}</strong>
+                <p style="margin: 5px 0 0 0; font-size: 12px; color: #666;">${lugar.tipo}</p>
+            `;
+            listItem.addEventListener('click', function() {
+                // Centrar mapa en la ubicación
+                map.setView(lugar.coords, 15);
+                marker.openPopup();
+                
+                // Resaltar elemento en la lista
+                document.querySelectorAll('.location-item').forEach(item => {
+                    item.classList.remove('active');
+                });
+                this.classList.add('active');
+            });
+
+            document.getElementById('location-list').appendChild(listItem);
+        });
+
+        // Funciones de control
+        function centrarLima() {
+            map.setView([-12.0464, -77.0428], 12);
+        }
+
+        function mostrarTodosMarcadores() {
+            const group = new L.featureGroup();
+            lugaresLima.forEach(lugar => {
+                group.addLayer(L.marker(lugar.coords));
+            });
+            map.fitBounds(group.getBounds().pad(0.1));
+        }
+
+        function limpiarMapa() {
+            markersGroup.clearLayers();
+            document.querySelectorAll('.location-item').forEach(item => {
+                item.classList.remove('active');
+            });
+        }
+
+        function dibujarZonaCentro() {
+            // Polígono aproximado del centro histórico
+            const polygon = L.polygon([
+                [-12.040, -77.055],
+                [-12.040, -77.030],
+                [-12.060, -77.030],
+                [-12.060, -77.055]
+            ], {
+                color: 'red',
+                fillColor: '#f03',
+                fillOpacity: 0.1,
+                weight: 2
+            }).addTo(map);
+            
+            polygon.bindPopup("Zona del Centro Histórico de Lima - Patrimonio de la Humanidad UNESCO");
+        }
+
+        // Ajustar mapa al cargar
+        setTimeout(() => {
+            map.invalidateSize();
+        }, 100);
+    </script>
+</body>
+</html>

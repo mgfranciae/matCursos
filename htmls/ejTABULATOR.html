@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tabulator - Demo</title>
+    <link href="https://unpkg.com/tabulator-tables@5.5.2/dist/css/tabulator.min.css" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        h1 {
+            color: #2a5298;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .info {
+            background: #e8f4fd;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border-left: 4px solid #3498db;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📊 Tabulator - Tabla Interactiva</h1>
+        
+        <div class="info">
+            <strong>Características demostradas:</strong> Ordenamiento, filtros, paginación, formato de números, soporte español.
+        </div>
+
+        <div id="empleados-table"></div>
+    </div>
+
+    <script src="https://unpkg.com/tabulator-tables@5.5.2/dist/js/tabulator.min.js"></script>
+    <script>
+        // Datos de ejemplo con caracteres españoles
+        const empleadosData = [
+            { id: 1, nombre: "Ana María García", puesto: "Desarrolladora Frontend", salario: 45000, departamento: "Tecnología", experiencia: 5 },
+            { id: 2, nombre: "Carlos José Martínez", puesto: "Analista de Datos", salario: 52000, departamento: "Analítica", experiencia: 7 },
+            { id: 3, nombre: "Luisa Fernández Niño", puesto: "Diseñadora UX/UI", salario: 48000, departamento: "Diseño", experiencia: 4 },
+            { id: 4, nombre: "Jorge Ramírez Sánchez", puesto: "Gerente de Proyecto", salario: 68000, departamento: "Gestión", experiencia: 10 },
+            { id: 5, nombre: "María del Pilar López", puesto: "Desarrolladora Backend", salario: 55000, departamento: "Tecnología", experiencia: 6 },
+            { id: 6, nombre: "Pedro Ángel Castillo", puesto: "Especialista SEO", salario: 42000, departamento: "Marketing", experiencia: 3 },
+            { id: 7, nombre: "Sofía Alejandra Ruiz", puesto: "Administradora de Sistemas", salario: 47000, departamento: "Tecnología", experiencia: 5 },
+            { id: 8, nombre: "Miguel Torres Díaz", puesto: "Contador Público", salario: 51000, departamento: "Finanzas", experiencia: 8 },
+            { id: 9, nombre: "Elena Cristina Vargas", puesto: "Recursos Humanos", salario: 44000, departamento: "HR", experiencia: 4 },
+            { id: 10, nombre: "Roberto Carlos Silva", puesto: "Especialista en Ciberseguridad", salario: 62000, departamento: "Tecnología", experiencia: 9 }
+        ];
+
+        // Inicializar Tabulator
+        const table = new Tabulator("#empleados-table", {
+            data: empleadosData,
+            layout: "fitColumns",
+            pagination: "local",
+            paginationSize: 5,
+            paginationSizeSelector: [5, 10, 20, 50],
+            columns: [
+                { title: "ID", field: "id", width: 80, hozAlign: "center", headerFilter: "input" },
+                { 
+                    title: "Nombre Completo", 
+                    field: "nombre", 
+                    headerFilter: "input",
+                    headerFilterPlaceholder: "Buscar nombre..."
+                },
+                { 
+                    title: "Puesto", 
+                    field: "puesto",
+                    headerFilter: "input",
+                    headerFilterPlaceholder: "Filtrar puesto..."
+                },
+                { 
+                    title: "Departamento", 
+                    field: "departamento",
+                    headerFilter: "select",
+                    headerFilterParams: { values: true }
+                },
+                { 
+                    title: "Salario (S/)", 
+                    field: "salario", 
+                    hozAlign: "right",
+                    formatter: "money",
+                    formatterParams: {
+                        symbol: "S/ ",
+                        symbolAfter: false,
+                        thousand: ",",
+                        precision: 0
+                    },
+                    headerFilter: "number"
+                },
+                { 
+                    title: "Experiencia (años)", 
+                    field: "experiencia", 
+                    hozAlign: "center",
+                    headerFilter: "number",
+                    headerFilterParams: { min: 1, max: 10 }
+                }
+            ],
+            locale: true,
+            langs: {
+                "es-es": {
+                    "pagination": {
+                        "first": "Primera",
+                        "first_title": "Primera Página",
+                        "last": "Última",
+                        "last_title": "Última Página",
+                        "prev": "Anterior",
+                        "prev_title": "Página Anterior",
+                        "next": "Siguiente",
+                        "next_title": "Siguiente Página"
+                    },
+                    "headerFilters": {
+                        "default": "Filtrar columna...",
+                    }
+                }
+            }
+        });
+    </script>
+</body>
+</html>

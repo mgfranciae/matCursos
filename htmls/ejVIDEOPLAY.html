@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Video HTML5</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        .video-container { margin: 20px 0; max-width: 800px; }
+        .controls { margin: 10px 0; }
+        button { padding: 8px 15px; margin: 0 5px; }
+    </style>
+</head>
+<body>
+    <h1>🎥 Controles de Video HTML5</h1>
+
+    <div class="video-container">
+        <h3>Video Básico con Controles</h3>
+        <video controls width="100%">
+            <source src="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4" type="video/mp4">
+            <source src="video/trailer.ogg" type="video/ogg">
+            Tu navegador no soporta el elemento video.
+        </video>
+    </div>
+
+    <div class="video-container">
+        <h3>Video con Poster y Múltiples Fuentes</h3>
+        <video controls width="100%" poster="https://picsum.photos/800/450" preload="metadata">
+            <source src="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4" type="video/mp4">
+            <source src="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4" type="video/mp4">
+            <track src="subtitles/es.vtt" kind="subtitles" srclang="es" label="Español">
+            <track src="subtitles/en.vtt" kind="subtitles" srclang="en" label="English">
+        </video>
+    </div>
+
+    <div class="video-container">
+        <h3>Video Personalizado</h3>
+        <video id="myVideo" width="100%" poster="https://picsum.photos/800/450">
+            <source src="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4" type="video/mp4">
+        </video>
+        <div class="controls">
+            <button onclick="playPause()">▶️/⏸️</button>
+            <button onclick="makeBig()">🔍 Grande</button>
+            <button onclick="makeNormal()">📏 Normal</button>
+            <button onclick="makeSmall()">🔍 Pequeño</button>
+            <input type="range" id="volume" min="0" max="1" step="0.1" value="1" onchange="setVolume()">
+            <span id="time">0:00 / 0:00</span>
+        </div>
+    </div>
+
+    <script>
+        const video = document.getElementById('myVideo');
+        
+        function playPause() {
+            if (video.paused) {
+                video.play();
+            } else {
+                video.pause();
+            }
+        }
+        
+        function makeBig() { video.width = 1000; }
+        function makeNormal() { video.width = 800; }
+        function makeSmall() { video.width = 400; }
+        function setVolume() { video.volume = document.getElementById('volume').value; }
+        
+        video.ontimeupdate = function() {
+            document.getElementById('time').textContent = 
+                formatTime(video.currentTime) + " / " + formatTime(video.duration);
+        };
+        
+        function formatTime(seconds) {
+            const min = Math.floor(seconds / 60);
+            const sec = Math.floor(seconds % 60);
+            return min + ":" + (sec < 10 ? "0" : "") + sec;
+        }
+    </script>
+</body>
+</html>

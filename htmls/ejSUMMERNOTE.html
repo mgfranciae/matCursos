@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Simple Summernote Example</title>
+  <!-- Bootstrap CSS for Summernote styling (required by Summernote) -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Summernote CSS CDN -->
+  <link href="https://cdn.jsdelivr.net/npm/summernote@0.9.1/dist/summernote-bs5.min.css" rel="stylesheet">
+  <style>
+    /* Basic styling for the editor container */
+    #summernote {
+      margin: 20px;
+    }
+    body {
+      font-family: Arial, sans-serif;
+    }
+  </style>
+</head>
+<body>
+  <h1>Simple Summernote Editor</h1>
+  <!-- Container for Summernote editor -->
+  <div id="summernote"></div>
+
+  <!-- jQuery CDN (required by Summernote) -->
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <!-- Bootstrap JS (required for Summernote toolbar functionality) -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <!-- Summernote JS CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/summernote@0.9.1/dist/summernote-bs5.min.js"></script>
+  <script>
+    // Initialize Summernote editor
+    $(document).ready(function() {
+      $('#summernote').summernote({
+        placeholder: 'Start typing here...',
+        height: 200, // Set editor height
+        tabsize: 2,
+        toolbar: [
+          ['style', ['style']],
+          ['font', ['bold', 'underline', 'clear']],
+          ['color', ['color']],
+          ['para', ['ul', 'ol', 'paragraph']],
+          ['table', ['table']],
+          ['insert', ['link', 'picture']],
+          ['view', ['fullscreen', 'codeview']]
+        ]
+      });
+      console.log('Summernote editor initialized successfully.');
+    });
+  </script>
+</body>
+</html>

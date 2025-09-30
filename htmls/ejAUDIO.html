@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Audio HTML5</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        .audio-container { margin: 20px 0; padding: 15px; background: #f0f0f0; border-radius: 8px; }
+    </style>
+</head>
+<body>
+    <h1>🎵 Controles de Audio HTML5</h1>
+
+    <div class="audio-container">
+        <h3>Audio Básico</h3>
+        <audio controls>
+            <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" type="audio/mpeg">
+            Tu navegador no soporta el elemento audio.
+        </audio>
+    </div>
+
+    <div class="audio-container">
+        <h3>Audio con Autoplay y Loop</h3>
+        <audio controls autoplay loop muted>
+   <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" type="audio/mpeg">
+            Tu navegador no soporta audio HTML5.
+        </audio>
+    </div>
+
+    <div class="audio-container">
+        <h3>Audio Personalizado con JavaScript</h3>
+        <audio id="customAudio">
+            <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3" type="audio/mpeg">
+        </audio>
+        <div>
+            <button onclick="document.getElementById('customAudio').play()">▶️ Reproducir</button>
+            <button onclick="document.getElementById('customAudio').pause()">⏸️ Pausar</button>
+            <button onclick="document.getElementById('customAudio').volume += 0.1">🔊 + Vol</button>
+            <button onclick="document.getElementById('customAudio').volume -= 0.1">🔈 - Vol</button>
+        </div>
+    </div>
+</body>
+</html>

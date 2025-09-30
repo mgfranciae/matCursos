@@ -1,0 +1,22 @@
+/* Basic styles for demo */
+body {
+  font-family: Arial, sans-serif;
+  margin: 20px;
+  text-align: center;
+}
+
+video {
+  width: 300px;
+  height: 200px;
+  border: 1px solid #ccc;
+  margin: 10px;
+}
+
+form {
+  margin: 20px 0;
+}
+
+input, button {
+  padding: 10px;
+  margin: 5px;
+}

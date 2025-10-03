@@ -2,7 +2,8 @@ const express = require('express');
 const path = require('path');
 const dotenv = require('dotenv');
 const multer = require('multer');
-const fs = require('fs');
+const fs = require('fs').promises;
+const cors = require('cors'); // Importar cors
 
 // Cargar variables de entorno
 dotenv.config();
@@ -19,15 +20,25 @@ if (!process.env.UPLOAD_DIR || !process.env.OUTPUT_DIR) {
 }
 
 // Asegurar que las carpetas existan
-[process.env.UPLOAD_DIR, process.env.OUTPUT_DIR].forEach(dir => {
-  if (!fs.existsSync(dir)) {
+[process.env.UPLOAD_DIR, process.env.OUTPUT_DIR].forEach(async dir => {
+  if (!(await fs.access(dir).then(() => true).catch(() => false))) {
     console.log(`Creando carpeta: ${dir}`);
-    fs.mkdirSync(dir, { recursive: true });
+    await fs.mkdir(dir, { recursive: true });
   }
 });
 
 // Inicializar aplicación Express
 const app = express();
+
+// Configurar middleware CORS
+// Configurar middleware CORS
+app.use(cors({
+  origin: '*', // Permitir solicitudes desde cualquier lugar, puede poner ip y puerto en especifico como http://localhost:5174.
+  methods: ['GET', 'POST'], // Métodos permitidos
+  allowedHeaders: ['Content-Type'], // Encabezados permitidos
+}));
+
+console.log('Middleware CORS configurado para http://localhost:5174');
 
 // Configurar middleware para servir archivos estáticos
 app.use(express.static(path.join(__dirname, '../public')));
@@ -54,7 +65,8 @@ const upload = multer({
       return cb(new Error('Solo se permiten imágenes.'));
     }
     cb(null, true);
-  }
+  },
+  limits: { fileSize: 10 * 1024 * 1024 } // Límite de 10MB
 });
 
 // Montar rutas
